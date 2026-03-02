@@ -34,6 +34,7 @@ python manage.py runserver
 A szerver ezután itt érhető el:
 
 http://127.0.0.1:8000
+
 http://127.0.0.1:8000/admin
 
 
@@ -53,3 +54,4 @@ Projekt struktúra
 
 config/ - Django projekt konfiguráció  
 rental/ - Bérlési logika és modellek  
+
