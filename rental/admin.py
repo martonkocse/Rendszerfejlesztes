@@ -1,0 +1,22 @@
+from django.contrib import admin
+from .models import User, Car, Rental, Invoice
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ("username", "email", "is_customer", "is_agent", "is_admin")
+
+
+@admin.register(Car)
+class CarAdmin(admin.ModelAdmin):
+    list_display = ("brand", "model", "year", "mileage", "daily_price", "available")
+
+
+@admin.register(Rental)
+class RentalAdmin(admin.ModelAdmin):
+    list_display = ("id", "status", "car", "customer", "start_date", "end_date")
+
+
+@admin.register(Invoice)
+class InvoiceAdmin(admin.ModelAdmin):
+    list_display = ("id", "rental", "amount", "issued_date", "paid")
