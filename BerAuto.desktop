@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=BerAuto szerver
+Comment=Django runserver indítás
+Path=/home/kocse/Dokumentumok/Rendszerfejlesztes/BerAuto
+Exec=konsole --noclose -e bash -lc "./run.sh; echo; echo 'Kilépéshez zárd be az ablakot.'; read -p 'Enter...'"
+Icon=utilities-terminal
+Terminal=false
+Categories=Development;
