@@ -14,6 +14,7 @@ export default function Home() {
         { id: 6, brand: "Volkswagen", model: "Golf", price: 55 },
         { id: 7, brand: "Škoda", model: "Octavia", price: 60 },
         { id: 8, brand: "Hyundai", model: "i30", price: 48 },
+        { id: 9, brand: "Opel", model: "Corsa", price: 35 },
     ]);
 
     return (
