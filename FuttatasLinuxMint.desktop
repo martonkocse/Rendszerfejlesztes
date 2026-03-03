@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=BerAuto szerver
+Comment=Django runserver indítása
+Path=/home/kocse/Letöltések/Rendszerfejlesztes-master
+Exec=gnome-terminal -- bash -c "/home/kocse/Letöltések/Rendszerfejlesztes-master/run.sh; exec bash"
+Icon=utilities-terminal
+Terminal=false
+Categories=Development;

@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.shortcuts import render
 
 def home(request):
-    return HttpResponse("BerAuto backend fut. Admin: /admin/")
+    return render(request, "rental/index.html")
