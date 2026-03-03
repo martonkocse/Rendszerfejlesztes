@@ -1,5 +1,5 @@
 ﻿import "./carlist.css";
-export default function CarCard({ brand, model, price }) {
+export default function Carlist({ brand, model, price }) {
     return (
         <div className="car-card">
             <h2>{brand} {model}</h2>
