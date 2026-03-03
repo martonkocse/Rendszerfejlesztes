@@ -1,11 +1,130 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8">
-  <title>BerAuto</title>
+    <meta charset="UTF-8">
+    <title>BérAutó rendszer</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #222;
+        }
+
+        header {
+            background-color: #1f2937;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .roles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .role-box {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 25px;
+            background-color: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        footer {
+            margin-top: 60px;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
 </head>
+
 <body>
-  <h1>BerAuto backend fut</h1>
-  <p><a href="/admin/">Admin felület</a></p>
+
+<header>
+    <h1>BérAutó</h1>
+    <p>Teljes körű autóbérlő rendszer igényléstől a számlázásig</p>
+</header>
+
+<div class="container">
+    <div class="card">
+        <h2>Projekt célja</h2>
+        <p>
+            A rendszer az autókölcsönzés teljes folyamatát kezeli.
+            Támogatja az igénylés rögzítését, jóváhagyását, az autó átadását és visszavételét,
+            valamint a számlázást. Jogosultságkezelésen alapuló, strukturált platform.
+        </p>
+
+        <div class="roles">
+            <div class="role-box">
+                <h3>Felhasználó</h3>
+                <p>
+                    Regisztrál, adatokat kezel, autót választ,
+                    kölcsönzési igényt ad le és visszanézi korábbi bérléseit.
+                </p>
+            </div>
+
+            <div class="role-box">
+                <h3>Ügyintéző</h3>
+                <p>
+                    Igényeket kezel, jóváhagy vagy elutasít,
+                    rögzíti az átadást, lezárja a bérlést és számlát állít ki.
+                </p>
+            </div>
+
+            <div class="role-box">
+                <h3>Adminisztrátor</h3>
+                <p>
+                    Autóállományt kezel, adatokat módosít,
+                    státuszt állít és biztosítja a rendszer működését.
+                </p>
+            </div>
+        </div>
+
+        <a href="/admin/" class="btn">Admin felület megnyitása</a>
+    </div>
+</div>
+
+<footer>
+    BérAutó rendszer · Django backend projekt
+</footer>
+
 </body>
 </html>
