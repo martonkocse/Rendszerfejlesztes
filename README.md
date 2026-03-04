@@ -55,3 +55,5 @@ Projekt struktúra
 config/ - Django projekt konfiguráció  
 rental/ - Bérlési logika és modellek  
 
+teszt
+
