@@ -19,4 +19,9 @@ urlpatterns = [
     path("api/protected/agent/", views.agent_only_view, name="agent_only"),
     path("api/protected/admin/", views.admin_only_view, name="admin_only"),
     path("api/protected/staff/", views.staff_only_view, name="staff_only"),
+    path("api/rentals/pending/", views.pending_rentals_view, name="pending_rentals"),
+    path("api/rentals/<int:rental_id>/approve/", views.approve_rental_view, name="approve_rental"),
+    path("api/rentals/<int:rental_id>/reject/", views.reject_rental_view, name="reject_rental"),
+    path("api/rentals/<int:rental_id>/hand-over/", views.hand_over_rental_view, name="hand_over_rental"),
+    path("api/rentals/<int:rental_id>/return/", views.return_rental_view, name="return_rental"),
 ]

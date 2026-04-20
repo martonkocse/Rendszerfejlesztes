@@ -396,6 +396,85 @@ def create_rental_view(request):
         status=201,
     )
 
+def process_rental_status_change(rental, new_status, user):
+    if new_status in {Rental.Status.APPROVED, Rental.Status.HANDED_OVER}:
+        if not is_car_available(
+            rental.car,
+            rental.start_date,
+            rental.end_date,
+            exclude_rental_id=rental.id,
+        ):
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": "Van már átfedő jóváhagyott vagy átadott bérlés erre az autóra.",
+                },
+                status=409,
+            )
+
+    rental.status = new_status
+    rental.agent = user
+
+    try:
+        rental.save()
+    except ValidationError as e:
+        return JsonResponse(
+            {
+                "success": False,
+                "errors": e.message_dict,
+            },
+            status=400,
+        )
+
+    return JsonResponse(
+        {
+            "success": True,
+            "message": "A bérlés státusza frissítve lett.",
+            "rental": rental_to_dict(rental),
+        }
+    )
+
+@require_GET
+@role_required([User.Role.AGENT, User.Role.ADMIN])
+def pending_rentals_view(request):
+    rentals = Rental.objects.filter(status=Rental.Status.PENDING).select_related(
+        "car", "customer", "agent"
+    ).order_by("created_at")
+
+    return JsonResponse(
+        {
+            "success": True,
+            "rentals": [rental_to_dict(rental) for rental in rentals],
+        }
+    )
+
+@csrf_exempt
+@require_POST
+@role_required([User.Role.AGENT, User.Role.ADMIN])
+def approve_rental_view(request, rental_id):
+    rental = get_object_or_404(Rental, id=rental_id)
+    return process_rental_status_change(rental, Rental.Status.APPROVED, request.user)
+
+@csrf_exempt
+@require_POST
+@role_required([User.Role.AGENT, User.Role.ADMIN])
+def reject_rental_view(request, rental_id):
+    rental = get_object_or_404(Rental, id=rental_id)
+    return process_rental_status_change(rental, Rental.Status.REJECTED, request.user)
+
+@csrf_exempt
+@require_POST
+@role_required([User.Role.AGENT, User.Role.ADMIN])
+def hand_over_rental_view(request, rental_id):
+    rental = get_object_or_404(Rental, id=rental_id)
+    return process_rental_status_change(rental, Rental.Status.HANDED_OVER, request.user)
+
+@csrf_exempt
+@require_POST
+@role_required([User.Role.AGENT, User.Role.ADMIN])
+def return_rental_view(request, rental_id):
+    rental = get_object_or_404(Rental, id=rental_id)
+    return process_rental_status_change(rental, Rental.Status.RETURNED, request.user)
 
 @csrf_exempt
 @require_POST
@@ -416,6 +495,9 @@ def update_rental_status_view(request, rental_id):
             {"success": False, "message": "Érvénytelen státusz."},
             status=400,
         )
+
+    rental = get_object_or_404(Rental, id=rental_id)
+    return process_rental_status_change(rental, new_status, request.user)
 
     rental = get_object_or_404(Rental, id=rental_id)
 
