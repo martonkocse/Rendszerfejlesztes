@@ -428,7 +428,18 @@ def update_rental_status_view(request, rental_id):
 
     rental.status = new_status
     rental.agent = request.user
-    rental.save()
+  
+
+    try:
+        rental.save()
+    except ValidationError as e:
+        return JsonResponse(
+            {
+                "success": False,
+                "errors": e.message_dict,
+            },
+            status=400,
+        )
 
     return JsonResponse(
         {

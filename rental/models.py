@@ -53,6 +53,14 @@ class Rental(models.Model):
         HANDED_OVER = "HANDED_OVER", "HANDED_OVER"
         RETURNED = "RETURNED", "RETURNED"
 
+    ALLOWED_TRANSITIONS = {
+        Status.PENDING: {Status.APPROVED, Status.REJECTED},
+        Status.APPROVED: {Status.HANDED_OVER},
+        Status.HANDED_OVER: {Status.RETURNED},
+        Status.REJECTED: set(),
+        Status.RETURNED: set(),
+    }
+
     car = models.ForeignKey(Car, on_delete=models.CASCADE)
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="rentals")
     agent = models.ForeignKey(
@@ -66,7 +74,11 @@ class Rental(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
 
-    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
 
     approved_at = models.DateTimeField(null=True, blank=True)
     handed_over_at = models.DateTimeField(null=True, blank=True)
@@ -95,7 +107,18 @@ class Rental(models.Model):
                 raise ValidationError(
                     {"end_date": "A záró dátum nem lehet múltbeli."}
                 )
-                
+
+        if self.pk:
+            old = Rental.objects.get(pk=self.pk)
+
+            if old.status != self.status:
+                allowed = self.ALLOWED_TRANSITIONS.get(old.status, set())
+
+                if self.status not in allowed:
+                    raise ValidationError(
+                        {"status": f"Nem engedélyezett státuszváltás: {old.status} -> {self.status}"}
+                    )
+
     def save(self, *args, **kwargs):
         self.full_clean()
 
