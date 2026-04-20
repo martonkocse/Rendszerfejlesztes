@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 
 from .decorators import login_required_json, role_required
 from .helpers import is_car_available
@@ -306,7 +307,7 @@ def car_availability_view(request, car_id):
 
 @csrf_exempt
 @require_POST
-@role_required([User.Role.CUSTOMER, User.Role.AGENT, User.Role.ADMIN])
+@login_required_json
 def create_rental_view(request):
     data = parse_json_body(request)
     if data is None:
@@ -315,7 +316,18 @@ def create_rental_view(request):
             status=400,
         )
 
-    car_id = data.get("car_id")
+    car_id = data.get("car")
+
+    if not car_id:
+        return JsonResponse(
+            {
+                "success": False,
+                "errors": {
+                    "car": ["A car mező kötelező."]
+                },
+            },
+            status=400,
+        )
 
     try:
         start_date = parse_date_value(data.get("start_date"), "start_date")
@@ -326,9 +338,36 @@ def create_rental_view(request):
             status=400,
         )
 
-    if start_date > end_date:
+    today = timezone.localdate()
+
+    if start_date < today:
         return JsonResponse(
-            {"success": False, "message": "A kezdő dátum nem lehet későbbi a záró dátumnál."},
+            {
+                "success": False,
+                "errors": {
+                    "start_date": ["A kezdő dátum nem lehet múltbeli."]
+                },
+            },
+            status=400,
+        )
+
+    if end_date < today:
+        return JsonResponse(
+            {
+                "success": False,
+                "errors": {
+                    "end_date": ["A záró dátum nem lehet múltbeli."]
+                },
+            },
+            status=400,
+        )
+
+    if start_date >= end_date:
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "A kezdő dátumnak korábbinak kell lennie, mint a záró dátum.",
+            },
             status=400,
         )
 
@@ -450,3 +489,5 @@ def staff_only_view(request):
             "role": request.user.role,
         }
     )
+
+

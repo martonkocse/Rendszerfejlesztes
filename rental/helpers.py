@@ -4,6 +4,7 @@ from .models import Rental
 
 
 BLOCKING_STATUSES = [
+    Rental.Status.PENDING,
     Rental.Status.APPROVED,
     Rental.Status.HANDED_OVER,
 ]

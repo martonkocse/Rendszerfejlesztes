@@ -78,9 +78,24 @@ class Rental(models.Model):
     def clean(self):
         super().clean()
 
-        if self.start_date and self.end_date and self.start_date > self.end_date:
-            raise ValidationError({"end_date": "A záró dátum nem lehet korábbi a kezdő dátumnál."})
+        if self.start_date and self.end_date:
+            if self.start_date >= self.end_date:
+                raise ValidationError(
+                    {"end_date": "A záró dátumnak későbbinek kell lennie, mint a kezdő dátum."}
+                )
 
+            today = timezone.localdate()
+
+            if self.start_date < today:
+                raise ValidationError(
+                    {"start_date": "A kezdő dátum nem lehet múltbeli."}
+                )
+
+            if self.end_date < today:
+                raise ValidationError(
+                    {"end_date": "A záró dátum nem lehet múltbeli."}
+                )
+                
     def save(self, *args, **kwargs):
         self.full_clean()
 
