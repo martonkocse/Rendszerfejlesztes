@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 
@@ -74,7 +75,15 @@ class Rental(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def clean(self):
+        super().clean()
+
+        if self.start_date and self.end_date and self.start_date > self.end_date:
+            raise ValidationError({"end_date": "A záró dátum nem lehet korábbi a kezdő dátumnál."})
+
     def save(self, *args, **kwargs):
+        self.full_clean()
+
         now = timezone.now()
 
         if self.status == self.Status.APPROVED and self.approved_at is None:
@@ -88,16 +97,7 @@ class Rental(models.Model):
 
         super().save(*args, **kwargs)
 
-        if self.status in (self.Status.APPROVED, self.Status.HANDED_OVER):
-            if self.car.available:
-                self.car.available = False
-                self.car.save(update_fields=["available"])
-
         if self.status == self.Status.RETURNED:
-            if not self.car.available:
-                self.car.available = True
-                self.car.save(update_fields=["available"])
-
             days = (self.end_date - self.start_date).days + 1
             if days < 1:
                 days = 1

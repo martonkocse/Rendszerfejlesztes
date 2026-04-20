@@ -12,11 +12,15 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(Car)
 class CarAdmin(admin.ModelAdmin):
     list_display = ("brand", "model", "year", "mileage", "daily_price", "available")
+    list_filter = ("available", "brand", "year")
+    search_fields = ("brand", "model")
 
 
 @admin.register(Rental)
 class RentalAdmin(admin.ModelAdmin):
     list_display = ("id", "status", "car", "customer", "agent", "start_date", "end_date")
+    list_filter = ("status", "start_date", "end_date")
+    search_fields = ("car__brand", "car__model", "customer__username", "agent__username")
 
 
 @admin.register(Invoice)

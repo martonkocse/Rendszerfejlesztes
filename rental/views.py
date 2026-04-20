@@ -1,15 +1,22 @@
 import json
+from datetime import datetime
 
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.csrf import csrf_exempt
 
 from .decorators import login_required_json, role_required
+from .helpers import is_car_available
+from .models import Car, Rental
+
 
 User = get_user_model()
+
+DATE_FORMAT = "%Y-%m-%d"
 
 
 def home(request):
@@ -23,6 +30,41 @@ def parse_json_body(request):
         return None
 
 
+def parse_date_value(value, field_name):
+    try:
+        return datetime.strptime(str(value), DATE_FORMAT).date()
+    except (TypeError, ValueError):
+        raise ValidationError({field_name: f"A(z) {field_name} mező formátuma YYYY-MM-DD legyen."})
+
+
+def rental_to_dict(rental):
+    return {
+        "id": rental.id,
+        "car": {
+            "id": rental.car.id,
+            "brand": rental.car.brand,
+            "model": rental.car.model,
+            "year": rental.car.year,
+        },
+        "customer": {
+            "id": rental.customer.id,
+            "username": rental.customer.username,
+        },
+        "agent": {
+            "id": rental.agent.id,
+            "username": rental.agent.username,
+        } if rental.agent else None,
+        "start_date": rental.start_date.isoformat(),
+        "end_date": rental.end_date.isoformat(),
+        "status": rental.status,
+        "approved_at": rental.approved_at.isoformat() if rental.approved_at else None,
+        "handed_over_at": rental.handed_over_at.isoformat() if rental.handed_over_at else None,
+        "returned_at": rental.returned_at.isoformat() if rental.returned_at else None,
+        "created_at": rental.created_at.isoformat(),
+        "updated_at": rental.updated_at.isoformat(),
+    }
+
+@csrf_exempt
 @require_POST
 def register_view(request):
     data = parse_json_body(request)
@@ -95,7 +137,7 @@ def register_view(request):
         status=201,
     )
 
-
+@csrf_exempt
 @require_POST
 def login_view(request):
     data = parse_json_body(request)
@@ -161,6 +203,199 @@ def me_view(request):
                 "phone_number": user.phone_number,
                 "address": user.address,
             },
+        }
+    )
+
+
+@require_GET
+@login_required_json
+def car_list_view(request):
+    start_date_raw = request.GET.get("start_date")
+    end_date_raw = request.GET.get("end_date")
+
+    start_date = None
+    end_date = None
+
+    if start_date_raw or end_date_raw:
+        if not start_date_raw or not end_date_raw:
+            return JsonResponse(
+                {"success": False, "message": "A start_date és az end_date együtt kötelező."},
+                status=400,
+            )
+
+        try:
+            start_date = parse_date_value(start_date_raw, "start_date")
+            end_date = parse_date_value(end_date_raw, "end_date")
+        except ValidationError as e:
+            return JsonResponse(
+                {"success": False, "errors": e.message_dict},
+                status=400,
+            )
+
+        if start_date > end_date:
+            return JsonResponse(
+                {"success": False, "message": "A kezdő dátum nem lehet későbbi a záró dátumnál."},
+                status=400,
+            )
+
+    cars = Car.objects.all().order_by("brand", "model", "year")
+    result = []
+
+    for car in cars:
+        reservable = car.available
+        if start_date and end_date:
+            reservable = is_car_available(car, start_date, end_date)
+
+        result.append(
+            {
+                "id": car.id,
+                "brand": car.brand,
+                "model": car.model,
+                "year": car.year,
+                "mileage": car.mileage,
+                "daily_price": car.daily_price,
+                "active": car.available,
+                "reservable": reservable,
+            }
+        )
+
+    return JsonResponse({"success": True, "cars": result})
+
+
+@require_GET
+@login_required_json
+def car_availability_view(request, car_id):
+    start_date_raw = request.GET.get("start_date")
+    end_date_raw = request.GET.get("end_date")
+
+    if not start_date_raw or not end_date_raw:
+        return JsonResponse(
+            {"success": False, "message": "A start_date és az end_date kötelező."},
+            status=400,
+        )
+
+    try:
+        start_date = parse_date_value(start_date_raw, "start_date")
+        end_date = parse_date_value(end_date_raw, "end_date")
+    except ValidationError as e:
+        return JsonResponse(
+            {"success": False, "errors": e.message_dict},
+            status=400,
+        )
+
+    if start_date > end_date:
+        return JsonResponse(
+            {"success": False, "message": "A kezdő dátum nem lehet későbbi a záró dátumnál."},
+            status=400,
+        )
+
+    car = get_object_or_404(Car, id=car_id)
+    reservable = is_car_available(car, start_date, end_date)
+
+    return JsonResponse(
+        {
+            "success": True,
+            "car_id": car.id,
+            "active": car.available,
+            "reservable": reservable,
+            "start_date": start_date.isoformat(),
+            "end_date": end_date.isoformat(),
+        }
+    )
+
+
+@csrf_exempt
+@require_POST
+@role_required([User.Role.CUSTOMER, User.Role.AGENT, User.Role.ADMIN])
+def create_rental_view(request):
+    data = parse_json_body(request)
+    if data is None:
+        return JsonResponse(
+            {"success": False, "message": "Hibás JSON kérés."},
+            status=400,
+        )
+
+    car_id = data.get("car_id")
+
+    try:
+        start_date = parse_date_value(data.get("start_date"), "start_date")
+        end_date = parse_date_value(data.get("end_date"), "end_date")
+    except ValidationError as e:
+        return JsonResponse(
+            {"success": False, "errors": e.message_dict},
+            status=400,
+        )
+
+    if start_date > end_date:
+        return JsonResponse(
+            {"success": False, "message": "A kezdő dátum nem lehet későbbi a záró dátumnál."},
+            status=400,
+        )
+
+    car = get_object_or_404(Car, id=car_id)
+
+    if not is_car_available(car, start_date, end_date):
+        return JsonResponse(
+            {"success": False, "message": "Az autó a megadott időszakban nem foglalható."},
+            status=409,
+        )
+
+    rental = Rental.objects.create(
+        car=car,
+        customer=request.user,
+        start_date=start_date,
+        end_date=end_date,
+        status=Rental.Status.PENDING,
+    )
+
+    return JsonResponse(
+        {
+            "success": True,
+            "message": "A bérlési igény rögzítve lett.",
+            "rental": rental_to_dict(rental),
+        },
+        status=201,
+    )
+
+
+@csrf_exempt
+@require_POST
+@role_required([User.Role.AGENT, User.Role.ADMIN])
+def update_rental_status_view(request, rental_id):
+    data = parse_json_body(request)
+    if data is None:
+        return JsonResponse(
+            {"success": False, "message": "Hibás JSON kérés."},
+            status=400,
+        )
+
+    new_status = str(data.get("status", "")).strip().upper()
+    allowed_statuses = {choice for choice, _ in Rental.Status.choices}
+
+    if new_status not in allowed_statuses:
+        return JsonResponse(
+            {"success": False, "message": "Érvénytelen státusz."},
+            status=400,
+        )
+
+    rental = get_object_or_404(Rental, id=rental_id)
+
+    if new_status in {Rental.Status.APPROVED, Rental.Status.HANDED_OVER}:
+        if not is_car_available(rental.car, rental.start_date, rental.end_date, exclude_rental_id=rental.id):
+            return JsonResponse(
+                {"success": False, "message": "Van már átfedő jóváhagyott vagy átadott bérlés erre az autóra."},
+                status=409,
+            )
+
+    rental.status = new_status
+    rental.agent = request.user
+    rental.save()
+
+    return JsonResponse(
+        {
+            "success": True,
+            "message": "A bérlés státusza frissítve lett.",
+            "rental": rental_to_dict(rental),
         }
     )
 
