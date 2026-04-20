@@ -4,7 +4,9 @@ from .models import User, Car, Rental, Invoice
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ("username", "email", "is_customer", "is_agent", "is_admin")
+    list_display = ("username", "email", "role", "is_customer", "is_agent", "is_admin")
+    list_filter = ("role", "is_customer", "is_agent", "is_admin")
+    search_fields = ("username", "email")
 
 
 @admin.register(Car)
@@ -14,7 +16,7 @@ class CarAdmin(admin.ModelAdmin):
 
 @admin.register(Rental)
 class RentalAdmin(admin.ModelAdmin):
-    list_display = ("id", "status", "car", "customer", "start_date", "end_date")
+    list_display = ("id", "status", "car", "customer", "agent", "start_date", "end_date")
 
 
 @admin.register(Invoice)

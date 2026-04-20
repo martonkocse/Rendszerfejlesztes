@@ -4,15 +4,32 @@ from django.utils import timezone
 
 
 class User(AbstractUser):
-    is_customer = models.BooleanField(default=False)
+    class Role(models.TextChoices):
+        CUSTOMER = "customer", "Customer"
+        AGENT = "agent", "Agent"
+        ADMIN = "admin", "Admin"
+
+    role = models.CharField(
+        max_length=20,
+        choices=Role.choices,
+        default=Role.CUSTOMER,
+    )
+
+    is_customer = models.BooleanField(default=True)
     is_agent = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
 
     phone_number = models.CharField(max_length=30, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        self.is_customer = self.role == self.Role.CUSTOMER
+        self.is_agent = self.role == self.Role.AGENT
+        self.is_admin = self.role == self.Role.ADMIN
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return self.username
+        return f"{self.username} ({self.role})"
 
 
 class Car(models.Model):
@@ -38,7 +55,11 @@ class Rental(models.Model):
     car = models.ForeignKey(Car, on_delete=models.CASCADE)
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="rentals")
     agent = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, blank=True, related_name="processed_rentals"
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="processed_rentals",
     )
 
     start_date = models.DateField()
@@ -77,7 +98,6 @@ class Rental(models.Model):
                 self.car.available = True
                 self.car.save(update_fields=["available"])
 
-            # számla generálás, ha még nincs
             days = (self.end_date - self.start_date).days + 1
             if days < 1:
                 days = 1
