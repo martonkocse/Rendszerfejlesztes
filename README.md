@@ -37,6 +37,9 @@ http://127.0.0.1:8000
 
 http://127.0.0.1:8000/admin
 
+API dokumentáció:
+Swagger ui felület elérhető innen:
+http://localhost:8000/api/docs/
 
 Admin user létrehozása
 
