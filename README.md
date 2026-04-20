@@ -41,6 +41,12 @@ API dokumentáció:
 Swagger ui felület elérhető innen:
 http://localhost:8000/api/docs/
 
+token kérés:
+http://localhost:8000/api/token/
+
+regisztráció:
+http://localhost:8000/api/auth/register/
+
 Admin user létrehozása
 
 ```md
