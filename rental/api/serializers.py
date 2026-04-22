@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from django.db.models import Q
+from ..helpers import is_car_available
 from ..models import Car, Rental, Invoice
 
 User = get_user_model()
@@ -20,10 +20,13 @@ class CarSerializer(serializers.ModelSerializer):
 
 class RentalSerializer(serializers.ModelSerializer):
     customer = UserSerializer(read_only=True)
+    agent = UserSerializer(read_only=True)
     car = CarSerializer(read_only=True)
 
     car_id = serializers.PrimaryKeyRelatedField(
-        queryset=Car.objects.all(), write_only=True, source="car"
+        queryset=Car.objects.all(),
+        write_only=True,
+        source="car"
     )
 
     class Meta:
@@ -33,6 +36,7 @@ class RentalSerializer(serializers.ModelSerializer):
             "car",
             "car_id",
             "customer",
+            "agent",
             "start_date",
             "end_date",
             "status",
@@ -45,6 +49,7 @@ class RentalSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "status",
             "customer",
+            "agent",
             "approved_at",
             "handed_over_at",
             "returned_at",
@@ -53,24 +58,27 @@ class RentalSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        validated_data["status"] = "PENDING"
+        validated_data["status"] = Rental.Status.PENDING
         return super().create(validated_data)
+
     def validate(self, data):
-        car = data.get("car")
-        start = data.get("start_date")
-        end = data.get("end_date")
+        instance = getattr(self, "instance", None)
 
-        # csak create-nél ellenőrizzük
+        car = data.get("car") or getattr(instance, "car", None)
+        start = data.get("start_date") or getattr(instance, "start_date", None)
+        end = data.get("end_date") or getattr(instance, "end_date", None)
+
         if car and start and end:
-            overlapping = Rental.objects.filter(
-                car=car
-            ).filter(
-                Q(start_date__lt=end) & Q(end_date__gt=start)
-            )
+            exclude_rental_id = instance.id if instance else None
 
-            if overlapping.exists():
+            if not is_car_available(
+                car=car,
+                start_date=start,
+                end_date=end,
+                exclude_rental_id=exclude_rental_id,
+            ):
                 raise serializers.ValidationError(
-                    "Ez az autó már foglalt ebben az időszakban."
+                    "Ez az autó ebben az időszakban nem foglalható."
                 )
 
         return data

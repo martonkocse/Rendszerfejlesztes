@@ -14,7 +14,16 @@ def is_car_available(car, start_date: date, end_date: date, exclude_rental_id=No
     if start_date > end_date:
         return False
 
-    if not car.available:
+    open_handover_exists = Rental.objects.filter(
+        car=car,
+        status=Rental.Status.HANDED_OVER,
+        returned_at__isnull=True,
+    )
+
+    if exclude_rental_id is not None:
+        open_handover_exists = open_handover_exists.exclude(id=exclude_rental_id)
+
+    if open_handover_exists.exists():
         return False
 
     overlapping_rentals = Rental.objects.filter(
