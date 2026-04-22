@@ -9,6 +9,29 @@ from ..models import Car, Rental, Invoice
 from .serializers import CarSerializer, RentalSerializer, InvoiceSerializer
 from .permissions import CarPermission, RentalPermission, InvoicePermission
 
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
+
+class RegisterView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        data = request.data
+
+        user = User.objects.create_user(
+            username=data["username"],
+            password=data["password"],
+            email=data.get("email", ""),
+            role=data.get("role", "customer"),
+        )
+
+        return Response({
+            "message": "User created"
+        }, status=status.HTTP_201_CREATED)
 
 class CarViewSet(ModelViewSet):
     queryset = Car.objects.all()
