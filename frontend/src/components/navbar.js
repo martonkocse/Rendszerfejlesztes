@@ -1,22 +1,15 @@
 ﻿import "./navbar.css";
 import { useNavigate } from "react-router-dom";
+import HomeButton from "./homebutton";
+import ToLoginPageButton from "./to-loginpage-button";
 
 export default function Navbar() {
-    const navigate = useNavigate();
-
-    const goHome = () => {
-        navigate("/api/cars");
-    };
-
+    
     return (
         <header className="navbar">
-            <button className="home-button" onClick={ goHome }>
-                Főoldal
-            </button>
+            <HomeButton />
 
-            <button className="login-button">
-                Bejelentkezés
-            </button>
+            <ToLoginPageButton />
 
             
         </header>
