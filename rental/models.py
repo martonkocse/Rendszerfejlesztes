@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -37,9 +37,28 @@ class Car(models.Model):
     brand = models.CharField(max_length=100)
     model = models.CharField(max_length=100)
     year = models.IntegerField()
-    mileage = models.IntegerField()
+    license_plate = models.CharField(max_length=20, unique=True)
+    mileage = models.IntegerField(default=0)
     daily_price = models.IntegerField(default=15000)
     available = models.BooleanField(default=True)
+
+    def clean(self):
+        super().clean()
+
+        current_year = timezone.localdate().year
+
+        if self.year < 1886 or self.year > current_year + 1:
+            raise ValidationError({"year": "Érvénytelen évjárat."})
+
+        if self.mileage < 0:
+            raise ValidationError({"mileage": "A kilométeróra állás nem lehet negatív."})
+
+        if self.daily_price <= 0:
+            raise ValidationError({"daily_price": "A napi díjnak pozitív értéknek kell lennie."})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.brand} {self.model} ({self.year})"
@@ -90,10 +109,19 @@ class Rental(models.Model):
     def clean(self):
         super().clean()
 
+        if not self.car_id:
+            raise ValidationError({"car": "Az autó megadása kötelező."})
+
+        if not self.customer_id:
+            raise ValidationError({"customer": "Az ügyfél megadása kötelező."})
+
+        if self.agent_id and self.agent.role not in [User.Role.AGENT, User.Role.ADMIN]:
+            raise ValidationError({"agent": "Csak ügyintéző vagy admin rendelhető a bérléshez."})
+
         if self.start_date and self.end_date:
-            if self.start_date >= self.end_date:
+            if self.start_date > self.end_date:
                 raise ValidationError(
-                    {"end_date": "A záró dátumnak későbbinek kell lennie, mint a kezdő dátum."}
+                    {"end_date": "A záró dátumnak legalább a kezdő dátummal egyezőnek kell lennie."}
                 )
 
             today = timezone.localdate()
@@ -119,6 +147,14 @@ class Rental(models.Model):
                         {"status": f"Nem engedélyezett státuszváltás: {old.status} -> {self.status}"}
                     )
 
+    def transition_to(self, new_status, *, agent=None):
+        self.status = new_status
+
+        if agent is not None:
+            self.agent = agent
+
+        self.save()
+
     def save(self, *args, **kwargs):
         self.full_clean()
 
@@ -133,26 +169,36 @@ class Rental(models.Model):
         if self.status == self.Status.RETURNED and self.returned_at is None:
             self.returned_at = now
 
-        super().save(*args, **kwargs)
+        with transaction.atomic():
+            super().save(*args, **kwargs)
 
-        if self.status == self.Status.RETURNED:
-            days = (self.end_date - self.start_date).days + 1
-            if days < 1:
-                days = 1
+            if self.status == self.Status.RETURNED:
+                days = (self.end_date - self.start_date).days + 1
+                amount = max(days, 1) * self.car.daily_price
 
-            amount = days * self.car.daily_price
+                Invoice.objects.get_or_create(
+                    rental=self,
+                    defaults={"amount": amount},
+                )
 
-            Invoice.objects.get_or_create(
-                rental=self,
-                defaults={"amount": amount},
-            )
-
+    def __str__(self):
+        return f"#{self.id} - {self.car} - {self.customer}"
 
 class Invoice(models.Model):
-    rental = models.OneToOneField(Rental, on_delete=models.CASCADE)
+    rental = models.OneToOneField(Rental, on_delete=models.CASCADE, related_name="invoice")
     amount = models.IntegerField()
     issued_date = models.DateField(auto_now_add=True)
     paid = models.BooleanField(default=False)
+
+    def clean(self):
+        super().clean()
+
+        if self.amount <= 0:
+            raise ValidationError({"amount": "A számla összege nem lehet nulla vagy negatív."})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Invoice #{self.id} (rental {self.rental_id})"

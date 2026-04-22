@@ -33,7 +33,7 @@ class CarPermission(BasePermission):
         if request.method in SAFE_METHODS:
             return True
 
-        return request.user.role == "admin"
+        return request.user.role in ["agent", "admin"]
 
 
 class RentalPermission(BasePermission):
