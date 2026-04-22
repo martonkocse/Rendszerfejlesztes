@@ -1,0 +1,12 @@
+.to-loginpage-button {
+    padding: 8px 16px;
+    background-color: black;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+    .to-loginpage-button:hover {
+        background-color: #333;
+    }
