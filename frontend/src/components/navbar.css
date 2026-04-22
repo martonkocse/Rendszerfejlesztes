@@ -17,3 +17,17 @@
 	.login-button:hover {
 		background-color: #333;
 	}
+
+.home-button {
+	padding: 8px 16px;
+	background-color: transparent;
+	color: black;
+	border: none;
+	cursor: pointer;
+	border-radius: 6px;
+	margin-right: 10px;
+	margin-right: auto;
+}
+    .home-button:hover {
+        background-color: #e0e0e0;
+    }
