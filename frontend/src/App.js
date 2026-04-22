@@ -6,7 +6,7 @@ function App() {
     return (
         <Routes>
             {/* When the path is "/", show the Home page */}
-            <Route path="/" element={<Home />} />
+            <Route path="/api/cars" element={<Home />} />
 
             {/* When the path is "/login", show the Login page */}
             <Route path="/login" element={<Login />} />
