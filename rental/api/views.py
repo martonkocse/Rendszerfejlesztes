@@ -12,26 +12,27 @@ from .permissions import CarPermission, RentalPermission, InvoicePermission
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
-
+from .serializers import RegisterSerializer
+from drf_spectacular.utils import extend_schema
 
 User = get_user_model()
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
+    @extend_schema(request=RegisterSerializer)
     def post(self, request):
-        data = request.data
+        serializer = RegisterSerializer(data=request.data)
 
-        user = User.objects.create_user(
-            username=data["username"],
-            password=data["password"],
-            email=data.get("email", ""),
-            role=data.get("role", "customer"),
-        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "Sikeres regisztráció"},
+                status=status.HTTP_201_CREATED
+            )
 
-        return Response({
-            "message": "User created"
-        }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 class CarViewSet(ModelViewSet):
     queryset = Car.objects.all()
