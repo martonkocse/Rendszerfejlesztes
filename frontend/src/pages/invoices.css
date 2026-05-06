@@ -111,3 +111,18 @@
     color: #991b1b;
     background-color: #fee2e2;
 }
+
+.pay-button {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    background-color: #2563eb;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.pay-button:hover {
+    background-color: #1d4ed8;
+}

@@ -84,6 +84,9 @@ class InvoicePermission(BasePermission):
 
         if view.action in ["create", "update", "partial_update", "destroy"]:
             return False
+        
+        if view.action == "pay":
+            return user.role in ["customer", "agent", "admin"]
 
         return False
 

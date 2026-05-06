@@ -89,7 +89,7 @@ export default function Invoices() {
 
     useEffect(() => {
         loadInvoices();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const findRental = (rentalId) => {
@@ -102,6 +102,51 @@ export default function Invoices() {
         }
 
         return new Date(date).toLocaleDateString("hu-HU");
+    };
+
+    const payInvoice = async (invoiceId) => {
+        const token = getToken();
+
+        if (!token) {
+            logoutAndRedirect();
+            return;
+        }
+
+        setError("");
+
+        try {
+            const response = await fetch(
+                `http://127.0.0.1:8000/api/invoices/${invoiceId}/pay/`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
+
+            if (response.status === 401 || response.status === 403) {
+                logoutAndRedirect();
+                return;
+            }
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || "Nem sikerült befizetni a számlát.");
+            }
+
+            setInvoices((prev) =>
+                prev.map((invoice) =>
+                    invoice.id === invoiceId
+                        ? { ...invoice, paid: true }
+                        : invoice
+                )
+            );
+        } catch (err) {
+            setError(err.message);
+        }
     };
 
     return (
@@ -144,6 +189,7 @@ export default function Invoices() {
                                     <th>Kiállítás dátuma</th>
                                     <th>Összeg</th>
                                     <th>Fizetve</th>
+                                    <th>Művelet</th>
                                 </tr>
                             </thead>
 
@@ -199,6 +245,22 @@ export default function Invoices() {
                                                 <span className={invoice.paid ? "paid-badge paid" : "paid-badge unpaid"}>
                                                     {invoice.paid ? "Igen" : "Nem"}
                                                 </span>
+                                            </td>
+
+                                            <td>
+                                                {!invoice.paid ? (
+                                                    <button
+                                                        type="button"
+                                                        className="pay-button"
+                                                        onClick={() => payInvoice(invoice.id)}
+                                                    >
+                                                        Befizetés
+                                                    </button>
+                                                ) : (
+                                                    <span className="muted-text">
+                                                        Befizetve
+                                                    </span>
+                                                )}
                                             </td>
                                         </tr>
                                     );

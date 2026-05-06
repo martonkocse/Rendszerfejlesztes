@@ -149,6 +149,25 @@ class InvoiceViewSet(ModelViewSet):
         )
 
     @action(detail=True, methods=["post"])
+    def pay(self, request, pk=None):
+        invoice = self.get_object()
+
+        if invoice.paid:
+            return Response(
+                {"detail": "Ez a számla már be van fizetve."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        invoice.paid = True
+        invoice.save(update_fields=["paid"])
+
+        return Response({
+            "message": "Sikeres befizetés.",
+            "invoice_id": invoice.id,
+            "paid": invoice.paid
+        })
+
+    @action(detail=True, methods=["post"])
     def generate(self, request, pk=None):
         rental = get_object_or_404(Rental, pk=pk)
 
