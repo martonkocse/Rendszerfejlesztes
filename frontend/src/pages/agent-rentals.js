@@ -32,7 +32,6 @@ export default function AgentRentals() {
 
         setIsLoading(true);
         setError("");
-        setMessage("");
 
         try {
             const response = await fetch("http://127.0.0.1:8000/api/rentals/", {
@@ -69,8 +68,8 @@ export default function AgentRentals() {
 
     useEffect(() => {
         loadRentals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
     const handleAction = async (rentalId, actionName, successText) => {
         const token = getToken();
 
@@ -106,6 +105,43 @@ export default function AgentRentals() {
             }
 
             setMessage(successText);
+            await loadRentals();
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleGenerateInvoice = async (rentalId) => {
+        const token = getToken();
+
+        if (!token) {
+            logoutAndRedirect();
+            return;
+        }
+
+        setMessage("");
+        setError("");
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/invoices/${rentalId}/generate/`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (data.detail) {
+                    throw new Error(data.detail);
+                }
+
+                throw new Error("A számla generálása nem sikerült.");
+            }
+
+            setMessage(`A számla elkészült. Számlaazonosító: #${data.invoice_id}, összeg: ${data.amount} Ft.`);
             await loadRentals();
         } catch (err) {
             setError(err.message);
@@ -189,6 +225,17 @@ export default function AgentRentals() {
             );
         }
 
+        if (rental.status === "RETURNED") {
+            return (
+                <button
+                    className="action-button invoice-button"
+                    onClick={() => handleGenerateInvoice(rental.id)}
+                >
+                    Számla generálása
+                </button>
+            );
+        }
+
         return <span className="no-action">Nincs elérhető művelet</span>;
     };
 
@@ -200,7 +247,7 @@ export default function AgentRentals() {
                 <section className="agent-header">
                     <h1>Ügyintézői felület</h1>
                     <p>
-                        Itt kezelhetők a beérkezett kölcsönzési igények, az autó átadása és visszavétele.
+                        Itt kezelhetők a beérkezett kölcsönzési igények, az autó átadása, visszavétele és a számla generálása.
                     </p>
                 </section>
 

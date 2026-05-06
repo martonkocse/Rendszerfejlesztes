@@ -20,6 +20,8 @@ export default function Navbar() {
 
             <nav className="navbar-links">
                 <Link to="/cars">Autók</Link>
+                <Link to="/my-rentals">Saját bérléseim</Link>
+                <Link to="/invoices">Számlák</Link>
                 <Link to="/agent/rentals">Ügyintézői felület</Link>
             </nav>
 

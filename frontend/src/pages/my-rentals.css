@@ -1,0 +1,145 @@
+.my-rentals-page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+.my-rentals-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.my-rentals-header h1 {
+    margin: 0 0 8px 0;
+    color: #111827;
+    font-size: 34px;
+}
+
+.my-rentals-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 16px;
+}
+
+.my-rentals-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 18px;
+}
+
+.my-rentals-toolbar button {
+    border: none;
+    border-radius: 10px;
+    padding: 11px 16px;
+    background-color: #111827;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.my-rentals-toolbar button:hover {
+    background-color: #374151;
+}
+
+.my-rentals-info {
+    text-align: center;
+    color: #374151;
+    background-color: white;
+    padding: 18px;
+    border-radius: 12px;
+}
+
+.my-rentals-error {
+    text-align: center;
+    color: #b91c1c;
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    padding: 14px;
+    border-radius: 12px;
+}
+
+.my-rentals-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.my-rental-card {
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+}
+
+.my-rental-card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.my-rental-card-header h2 {
+    margin: 0;
+    color: #111827;
+    font-size: 21px;
+}
+
+.my-rental-details p {
+    margin: 8px 0;
+    color: #4b5563;
+}
+
+.my-rental-details strong {
+    color: #111827;
+}
+
+.my-rental-price {
+    color: #111827 !important;
+    font-weight: 700;
+}
+
+.rental-status {
+    width: fit-content;
+    padding: 7px 11px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.pending {
+    color: #92400e;
+    background-color: #fef3c7;
+}
+
+.approved {
+    color: #1d4ed8;
+    background-color: #dbeafe;
+}
+
+.rejected {
+    color: #991b1b;
+    background-color: #fee2e2;
+}
+
+.handed-over {
+    color: #6d28d9;
+    background-color: #ede9fe;
+}
+
+.returned {
+    color: #166534;
+    background-color: #dcfce7;
+}
+
+@media (max-width: 1000px) {
+    .my-rentals-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .my-rentals-grid {
+        grid-template-columns: 1fr;
+    }
+}
