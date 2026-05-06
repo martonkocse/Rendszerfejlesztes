@@ -4,7 +4,7 @@ body {
     background-color: #f3f4f6;
 }
 
-.login-page {
+.register-page {
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -13,54 +13,54 @@ body {
     background-color: #f3f4f6;
 }
 
-.login-card {
+.register-card {
     width: 100%;
-    max-width: 420px;
+    max-width: 460px;
     background-color: white;
-    padding: 36px;
+    padding: 34px;
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
-.login-card h1 {
+.register-card h1 {
     margin: 0 0 8px 0;
     text-align: center;
-    font-size: 32px;
+    font-size: 30px;
     color: #111827;
 }
 
-.login-subtitle {
-    margin: 0 0 28px 0;
+.register-subtitle {
+    margin: 0 0 24px 0;
     text-align: center;
     color: #6b7280;
     line-height: 1.5;
 }
 
-.login-form {
+.register-form {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 9px;
 }
 
-.login-form label {
+.register-form label {
     font-weight: 600;
     color: #374151;
-    margin-top: 8px;
+    margin-top: 6px;
 }
 
-.login-form input {
-    padding: 12px 14px;
+.register-form input {
+    padding: 11px 13px;
     border: 1px solid #d1d5db;
     border-radius: 10px;
     font-size: 15px;
 }
 
-.login-form input:focus {
+.register-form input:focus {
     outline: none;
     border-color: #111827;
 }
 
-.login-form button {
+.register-form button {
     margin-top: 18px;
     padding: 13px;
     border: none;
@@ -72,16 +72,16 @@ body {
     cursor: pointer;
 }
 
-.login-form button:hover {
+.register-form button:hover {
     background-color: #374151;
 }
 
-.login-form button:disabled {
+.register-form button:disabled {
     background-color: #9ca3af;
     cursor: not-allowed;
 }
 
-.login-error {
+.register-error {
     margin: 10px 0 0 0;
     color: #b91c1c;
     background-color: #fee2e2;
@@ -90,18 +90,27 @@ body {
     border-radius: 8px;
 }
 
-.register-link-text {
+.register-success {
+    margin: 10px 0 0 0;
+    color: #166534;
+    background-color: #dcfce7;
+    border: 1px solid #bbf7d0;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.login-link-text {
     margin: 22px 0 0 0;
     text-align: center;
     color: #6b7280;
 }
 
-.register-link-text a {
+.login-link-text a {
     color: #111827;
     font-weight: 700;
     text-decoration: none;
 }
 
-.register-link-text a:hover {
+.login-link-text a:hover {
     text-decoration: underline;
 }
