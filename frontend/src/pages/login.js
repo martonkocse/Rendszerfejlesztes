@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./login.css";
 
 export default function Login() {
@@ -81,6 +81,10 @@ export default function Login() {
                         {isLoading ? "Bejelentkezés..." : "Bejelentkezés"}
                     </button>
                 </form>
+
+                <p className="register-link-text">
+                    Nincs még fiókod? <Link to="/register">Regisztráció</Link>
+                </p>
             </div>
         </div>
     );
