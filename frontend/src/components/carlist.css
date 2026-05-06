@@ -1,22 +1,75 @@
 .car-card {
-    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 245px;
     padding: 20px;
-    border-radius: 10px;
-    text-align: center;
+    border-radius: 16px;
     background-color: white;
-    transition: 0.2s;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
 }
 
-    .car-card:hover {
-        transform: scale(1.03);
-    }
+.car-card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
-    .car-card button {
-        margin-top: 10px;
-        padding: 6px 12px;
-        border: none;
-        background-color: black;
-        color: white;
-        cursor: pointer;
-        border-radius: 6px;
-    }
+.car-card h2 {
+    margin: 0;
+    color: #111827;
+    font-size: 21px;
+}
+
+.status {
+    width: fit-content;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.available {
+    color: #166534;
+    background-color: #dcfce7;
+}
+
+.unavailable {
+    color: #991b1b;
+    background-color: #fee2e2;
+}
+
+.car-details {
+    margin-top: 16px;
+}
+
+.car-details p {
+    margin: 7px 0;
+    color: #4b5563;
+}
+
+.price {
+    font-weight: 800;
+    color: #111827 !important;
+}
+
+.car-card button {
+    margin-top: 18px;
+    padding: 11px;
+    border: none;
+    border-radius: 10px;
+    background-color: #111827;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.car-card button:hover {
+    background-color: #374151;
+}
+
+.car-card button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+}

@@ -1,15 +1,14 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/home";
 import Login from "./pages/login";
 
 function App() {
     return (
         <Routes>
-            {/* When the path is "/", show the Home page */}
-            <Route path="/api/cars" element={<Home />} />
-
-            {/* When the path is "/login", show the Login page */}
+            <Route path="/" element={<Navigate to="/cars" replace />} />
+            <Route path="/cars" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="*" element={<Navigate to="/cars" replace />} />
         </Routes>
     );
 }
