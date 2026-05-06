@@ -1,0 +1,177 @@
+.agent-page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+.agent-header {
+    text-align: center;
+    margin-bottom: 26px;
+}
+
+.agent-header h1 {
+    margin: 0 0 8px 0;
+    color: #111827;
+    font-size: 34px;
+}
+
+.agent-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 16px;
+}
+
+.agent-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 18px;
+}
+
+.refresh-button {
+    border: none;
+    border-radius: 10px;
+    padding: 11px 16px;
+    background-color: #111827;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.refresh-button:hover {
+    background-color: #374151;
+}
+
+.agent-info {
+    text-align: center;
+    color: #374151;
+    background-color: white;
+    padding: 18px;
+    border-radius: 12px;
+}
+
+.agent-success {
+    color: #166534;
+    background-color: #dcfce7;
+    border: 1px solid #bbf7d0;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+}
+
+.agent-error {
+    color: #b91c1c;
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+}
+
+.rentals-table-wrapper {
+    overflow-x: auto;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+}
+
+.rentals-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.rentals-table th,
+.rentals-table td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+.rentals-table th {
+    color: #374151;
+    background-color: #f9fafb;
+    font-size: 14px;
+}
+
+.rentals-table tr:last-child td {
+    border-bottom: none;
+}
+
+.muted-text {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 7px 11px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.pending {
+    color: #92400e;
+    background-color: #fef3c7;
+}
+
+.approved {
+    color: #1d4ed8;
+    background-color: #dbeafe;
+}
+
+.rejected {
+    color: #991b1b;
+    background-color: #fee2e2;
+}
+
+.handed-over {
+    color: #6d28d9;
+    background-color: #ede9fe;
+}
+
+.returned {
+    color: #166534;
+    background-color: #dcfce7;
+}
+
+.action-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.action-button {
+    border: none;
+    border-radius: 9px;
+    padding: 9px 12px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.approve-button {
+    background-color: #166534;
+}
+
+.reject-button {
+    background-color: #991b1b;
+}
+
+.handover-button {
+    background-color: #1d4ed8;
+}
+
+.return-button {
+    background-color: #6d28d9;
+}
+
+.action-button:hover {
+    opacity: 0.9;
+}
+
+.no-action {
+    color: #6b7280;
+    font-size: 14px;
+}

@@ -18,6 +18,11 @@ export default function Navbar() {
                 BérAutó
             </Link>
 
+            <nav className="navbar-links">
+                <Link to="/cars">Autók</Link>
+                <Link to="/agent/rentals">Ügyintézői felület</Link>
+            </nav>
+
             <div className="navbar-actions">
                 {username && <span className="navbar-user">{username}</span>}
 

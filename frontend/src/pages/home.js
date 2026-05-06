@@ -70,7 +70,7 @@ export default function Home() {
                 <section className="home-header">
                     <h1>Elérhető autók</h1>
                     <p>
-                        Itt láthatod a rendszerben szereplő bérelhető járműveket.
+                        Válaszd ki az autót, add meg a bérlés időszakát, majd küldd be az igényt.
                     </p>
                 </section>
 
@@ -87,6 +87,7 @@ export default function Home() {
                         {cars.map((car) => (
                             <Carlist
                                 key={car.id}
+                                id={car.id}
                                 brand={car.brand}
                                 model={car.model}
                                 year={car.year}

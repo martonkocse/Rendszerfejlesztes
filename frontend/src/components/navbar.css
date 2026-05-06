@@ -2,6 +2,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 24px;
     padding: 18px 32px;
     background-color: white;
     border-bottom: 1px solid #e5e7eb;
@@ -12,6 +13,23 @@
     font-size: 22px;
     font-weight: 800;
     text-decoration: none;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.navbar-links a {
+    color: #374151;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.navbar-links a:hover {
+    color: #111827;
+    text-decoration: underline;
 }
 
 .navbar-actions {
@@ -37,4 +55,22 @@
 
 .logout-button:hover {
     background-color: #374151;
+}
+
+@media (max-width: 720px) {
+    .navbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .navbar-links {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .navbar-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
 }
